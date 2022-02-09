@@ -8,34 +8,36 @@ import (
 	"github.com/PuerkitoBio/goquery"
 )
 
-type urlSet struct {
-	url        string
-	company    string
-	location   string
-	apply_link string
-}
 
-var mainURL = "https://www.jobkorea.co.kr/Search/?stext=%EA%B0%9C%EB%B0%9C%EC%9E%90"
+var mainURL = "https://www.jobkorea.co.kr/Search/?stext=개발자&tabType=recruit"
 
 func main() {
-	getPages()
+	totalPageNum := getPages(mainURL)
+	fmt.Println(totalPageNum)
 }
 
-func getPages() int {
+func getPages(mainURL string) int {
+	pages := 0
 	res, err := http.Get(mainURL)
 	checkErr(err)
 	checkCode(res)
 
 	defer res.Body.Close()
-
+	
 	doc, err := goquery.NewDocumentFromReader(res.Body)
 	checkErr(err)
 
-	doc.Find(".tplPagination").Each(func(i int, s *goquery.Selection) {
-		fmt.Println(s.Find("a"))
+	// HTML parsing Point
+	// # Priority
+	// 출력된 결과 분석
+	// 		현재 코드 - 원하는 결과값의 마지막 부분, 동일 결과값이 두번 출력됨
+	// 결과와 코드를 수정하여 올바른 결과값 얻기 ==> 9 or 10
+	
+	doc.Find(".tplPagination").Each(func(idx int, sel *goquery.Selection) {
+		pages = sel.Find("a").Length() // must convert string to int
 	})
-
-	return 0
+	
+	return pages
 }
 
 func checkErr(err error) {

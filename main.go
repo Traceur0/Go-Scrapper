@@ -8,6 +8,9 @@ import (
 	"github.com/PuerkitoBio/goquery"
 )
 
+type pageNumber struct {
+	p_num string
+}
 
 var mainURL = "https://www.jobkorea.co.kr/Search/?stext=개발자&tabType=recruit"
 
@@ -16,7 +19,7 @@ func main() {
 	fmt.Println(totalPageNum)
 }
 
-func getPages(mainURL string) *goquery.Selection {
+func getPages(mainURL string) int {
 	// pages := 0
 
 	res, err := http.Get(mainURL)
@@ -28,18 +31,13 @@ func getPages(mainURL string) *goquery.Selection {
 	doc, err := goquery.NewDocumentFromReader(res.Body)
 	checkErr(err)
 
-	// HTML parsing Point
-	// # Priority
-	// 출력된 결과 분석
-	// 		현재 코드 - 원하는 결과값의 마지막 부분, 동일 결과값이 두번 출력됨
-	// 결과와 코드를 수정하여 올바른 결과값 얻기 ==> 9 or 10
 	
 	pagination := doc.Find(".tplPagination")
 	pagination.Each(func(idx int, sel *goquery.Selection) {
-		pagination := sel.Find(".pgTotal")
-		fmt.Println(pagination)
+		p_num := sel.Find(".pgTotal").Text()
+		fmt.Println(p_num)
 	})
-	return pagination
+	return p_num
 }
 
 

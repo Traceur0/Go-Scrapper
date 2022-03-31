@@ -16,8 +16,9 @@ func main() {
 	fmt.Println(totalPageNum)
 }
 
-func getPages(mainURL string) int {
-	pages := 0
+func getPages(mainURL string) *goquery.Selection {
+	// pages := 0
+
 	res, err := http.Get(mainURL)
 	checkErr(err)
 	checkCode(res)
@@ -33,12 +34,14 @@ func getPages(mainURL string) int {
 	// 		현재 코드 - 원하는 결과값의 마지막 부분, 동일 결과값이 두번 출력됨
 	// 결과와 코드를 수정하여 올바른 결과값 얻기 ==> 9 or 10
 	
-	doc.Find(".tplPagination").Each(func(idx int, sel *goquery.Selection) {
-		pages = sel.Find("a").Length() // must convert string to int
+	pagination := doc.Find(".tplPagination")
+	pagination.Each(func(idx int, sel *goquery.Selection) {
+		pagination := sel.Find(".pgTotal")
+		fmt.Println(pagination)
 	})
-	
-	return pages
+	return pagination
 }
+
 
 func checkErr(err error) {
 	if err != nil {

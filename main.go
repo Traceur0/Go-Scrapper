@@ -8,21 +8,18 @@ import (
 	"github.com/PuerkitoBio/goquery"
 )
 
-type pageNumber struct {
-	p_num string
-}
-
 var mainURL = "https://www.jobkorea.co.kr/Search/?stext=개발자&tabType=recruit"
 
 func main() {
-	totalPageNum := getPages(mainURL)
-	fmt.Println(totalPageNum)
+	// totalPageNum := getPages(mainURL)
+	// fmt.Println(totalPageNum)
+	getPages(mainURL)
 }
 
-func getPages(mainURL string) int {
+func getPages(URL string) {
 	// pages := 0
 
-	res, err := http.Get(mainURL)
+	res, err := http.Get(URL)
 	checkErr(err)
 	checkCode(res)
 
@@ -31,13 +28,13 @@ func getPages(mainURL string) int {
 	doc, err := goquery.NewDocumentFromReader(res.Body)
 	checkErr(err)
 
-	
-	pagination := doc.Find(".tplPagination")
-	pagination.Each(func(idx int, sel *goquery.Selection) {
-		p_num := sel.Find(".pgTotal").Text()
-		fmt.Println(p_num)
-	})
-	return p_num
+	// last_pages := doc.Find("span.pgTotal")
+	last_pages := doc.Find(".tplPagination > ul > li > span")
+	// doc.Find(".tplPagination").Each(func(idx int, sel *goquery.Selection) {
+	// 	pages := sel.Find("span.pgTotal").Parent()
+	// })
+	fmt.Println(last_pages)
+	return
 }
 
 

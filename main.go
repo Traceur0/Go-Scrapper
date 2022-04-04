@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"strings"
 
 	"github.com/PuerkitoBio/goquery"
 )
@@ -12,14 +11,16 @@ import (
 var mainURL = "https://www.jobkorea.co.kr/Search/?stext=개발자&tabType=recruit"
 
 func main() {
+	not_trimed := getPages(mainURL)
+
 	// totalPageNum := getPages(mainURL)
 	// fmt.Println(totalPageNum)
-	getPages(mainURL)
+	fmt.Println(not_trimed)
 }
 
-func getPages(URL string) {
-	// page_list = []int{}
-
+func getPages(URL string) int {
+	last_pages := 0
+	
 	res, err := http.Get(URL)
 	checkErr(err)
 	checkCode(res)
@@ -32,11 +33,9 @@ func getPages(URL string) {
 	// last_pages := doc.Find("span.pgTotal")
 	list := doc.Find(".tplPagination > ul.clear > li")
 	list.Each(func(idx int, sel *goquery.Selection) {
-		last_pages := sel.Find("span.pgTotal").Text()
-		trimmed_page := strings.ReplaceAll(last_pages, "\n", "")
-		fmt.Println(trimmed_page)
+		last_pages = sel.Find("span.pgTotdal").Length()
 	})
-	return
+	return last_pages
 }
 
 

@@ -18,9 +18,10 @@ func main() {
 	fmt.Println(not_trimed)
 }
 
-func getPages(URL string) int {
-	last_pages := 0
-	
+func getPages(URL string) string {
+	pages := ""
+	last_page := ""
+
 	res, err := http.Get(URL)
 	checkErr(err)
 	checkCode(res)
@@ -30,12 +31,13 @@ func getPages(URL string) int {
 	doc, err := goquery.NewDocumentFromReader(res.Body)
 	checkErr(err)
 
-	// last_pages := doc.Find("span.pgTotal")
-	list := doc.Find(".tplPagination > ul.clear > li")
-	list.Each(func(idx int, sel *goquery.Selection) {
-		last_pages = sel.Find("span.pgTotdal").Length()
-	})
-	return last_pages
+	pages = doc.Find("span.pgTotal").Text()
+	last_page = pages[:3]
+	// list := doc.Find(".tplPagination > ul.clear > li")
+	// list.Each(func(idx int, sel *goquery.Selection) {
+	// 	last_pages = sel.Find("span.pgTotdal").Text()
+	// })
+	return last_page
 }
 
 

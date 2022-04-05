@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"strconv"
 
 	"github.com/PuerkitoBio/goquery"
 )
@@ -18,9 +19,8 @@ func main() {
 	fmt.Println(not_trimed)
 }
 
-func getPages(URL string) string {
+func getPages(URL string) int {
 	pages := ""
-	last_page := ""
 
 	res, err := http.Get(URL)
 	checkErr(err)
@@ -32,12 +32,13 @@ func getPages(URL string) string {
 	checkErr(err)
 
 	pages = doc.Find("span.pgTotal").Text()
-	last_page = pages[:3]
+	last_page := pages[0:3]
+	int_page, _ := strconv.Atoi(last_page)
 	// list := doc.Find(".tplPagination > ul.clear > li")
 	// list.Each(func(idx int, sel *goquery.Selection) {
 	// 	last_pages = sel.Find("span.pgTotdal").Text()
 	// })
-	return last_page
+	return int_page
 }
 
 

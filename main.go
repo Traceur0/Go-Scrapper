@@ -88,6 +88,9 @@ func checkCode(res *http.Response) {
 }
 
 func strClnr(str string) []string { // stringCleaner
-	return strings.Fields(strings.TrimSpace(str))
-	//
+	var slice []string
+	append(slice, str)
+	return strings.TrimSpace(str)
 }
+
+// 두가지 선택지

@@ -10,9 +10,9 @@ import (
 	"github.com/PuerkitoBio/goquery"
 )
 
-// extractedJobSet
+// define extractedJobSet
 type extractedJob struct {
-	id			int		// Attr.data-gno
+	id			string		// Attr.data-gno
 	company		string	// div.post-list-corp > a.title
 	title		string	// div.post-list-info > a.title
 	career		string	// span.exp
@@ -23,15 +23,21 @@ type extractedJob struct {
 var mainURL string = "https://www.jobkorea.co.kr/Search/?stext=개발자&tabType=recruit"
 
 func main() {
+	var jobs []extractedJob
 	// lastP := getLastPages(mainURL)
 
 	// for i := 1; i <= lastP; i++{
 	// 	extractPage(i)
 	// }
-	extractPage(1)
+	extractedjobs := getPage(1)
+	jobs = append(jobs, extractedjobs...)
+	
+	fmt.Println(jobs)
 }
 
-func extractPage(page int) {
+func getPage(page int) []extractedJob {
+	var jobs []extractedJob
+
 	pageURL := mainURL + "&Page_No=" + strconv.Itoa(page)
 	fmt.Println("Requesting", pageURL)
 	res, err := http.Get(pageURL)
@@ -44,43 +50,37 @@ func extractPage(page int) {
 	checkErr(err)
 
 	postList := doc.Find("li.list-post") // 20EA -> 20(what i want)+20(dummy data)
-	company_list := []string{}
-	location_list := []string{}
 
 	postList.EachWithBreak(func(i int, card *goquery.Selection) bool {
-		// id, _ := card.Attr("data-gno")
 		company := strClnr(card.Find("div.post-list-corp > a").Text())
-		// fmt.Println(company)
-		// title := strClnr(card.Find("div.post-list-info > a.title").Text())
-		// career := strClnr(card.Find("span.exp").Text())
-		// deadline := strClnr(card.Find("p.option > span.date").Text())
+		
+		job := extractPage(card)
+		jobs = append(jobs, job)
 
 		if company != "" {
-			company_list = append(company_list, company)
-			/*
-			extractedPage{
-				id:			id, 
-				company:	company, 
-				title:		title, 
-				career:		career, 
-				deadline:	deadline}
-			*/
 			return true
 		}
 		return false // End of EachWithBreak
 	})
-
-	fmt.Println(company_list)
-
-	postList.EachWithBreak(func(i int, card *goquery.Selection) bool {
-		location := card.Find("span.long").Text()
-		if location != "" {
-			location_list = append(location_list, location)
-			return true
-		}
-		return false
-	})
+	return jobs
 }
+
+func extractPage(card *goquery.Selection) extractedJob {
+	id, _ := card.Attr("data-gno")
+	company := strClnr(card.Find("div.post-list-corp > a").Text())
+	location := card.Find("span.long").Text()
+	title := strClnr(card.Find("div.post-list-info > a.title").Text())
+	career := strClnr(card.Find("span.exp").Text())
+	deadline := strClnr(card.Find("p.option > span.date").Text())
+	return extractedJob{
+		id:			id,
+		company:	company,
+		location:	location,
+		title:		title,
+		career:		career,
+		deadline:	deadline}
+}
+
 
 // func getLastPages(URL string) int {
 // 	pages := ""
@@ -114,7 +114,7 @@ func checkCode(res *http.Response) {
 }
 
 func strClnr(str string) string { // stringCleaner
-	return strings.Join(strings.Fields(strings.TrimSpace(str)), " ") // strings.fields() Deleted. // strings.join() Needed.
+	return strings.Join(strings.Fields(strings.TrimSpace(str)), " ")// strings.fields() Deleted. // strings.join() Needed.
 }
 
 // 두가지 선택지

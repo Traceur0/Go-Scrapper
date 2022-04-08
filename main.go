@@ -45,7 +45,7 @@ func writeJobs(jobs []extractedJob) {
 	file.Write(utf8Applier)
 
 	w := csv.NewWriter(file)
-	defer w.Flush()
+	defer w.Flush() // Finishing process
 
 	headers := []string{"ID", "COMPANY", "LOCATION", "TITLE", "CAREER", "DEADLINE"}
 
@@ -68,7 +68,7 @@ func getPage(page int) []extractedJob {
 	checkErr(err)
 	checkCode(res)
 
-	defer res.Body.Close()
+	defer res.Body.Close() 
 	
 	doc, err := goquery.NewDocumentFromReader(res.Body)
 	checkErr(err)

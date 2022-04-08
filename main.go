@@ -10,6 +10,7 @@ import (
 	"github.com/PuerkitoBio/goquery"
 )
 
+// extractedJobSet
 type extractedJob struct {
 	id			int		// Attr.data-gno
 	company		string	// div.post-list-corp > a.title
@@ -42,17 +43,42 @@ func extractPage(page int) {
 	doc, err := goquery.NewDocumentFromReader(res.Body)
 	checkErr(err)
 
-	postList := doc.Find("li.list-post") // 20EA
+	postList := doc.Find("li.list-post") // 20EA -> 20(what i want)+20(dummy data)
+	company_list := []string{}
+	location_list := []string{}
 
-	postList.Each(func(i int, card *goquery.Selection) {
+	postList.EachWithBreak(func(i int, card *goquery.Selection) bool {
 		// id, _ := card.Attr("data-gno")
-		// company := strClnr(card.Find("div.post-list-corp > a.title").Text())
+		company := strClnr(card.Find("div.post-list-corp > a").Text())
+		// fmt.Println(company)
 		// title := strClnr(card.Find("div.post-list-info > a.title").Text())
 		// career := strClnr(card.Find("span.exp").Text())
-		// location := card.Find("span.long").Text()
-		// deadline := strClnr(card.Find("span.date").Text())
-		deadline := strClnr(card.Find("span.date").Text())
-		fmt.Println(deadline)
+		// deadline := strClnr(card.Find("p.option > span.date").Text())
+
+		if company != "" {
+			company_list = append(company_list, company)
+			/*
+			extractedPage{
+				id:			id, 
+				company:	company, 
+				title:		title, 
+				career:		career, 
+				deadline:	deadline}
+			*/
+			return true
+		}
+		return false // End of EachWithBreak
+	})
+
+	fmt.Println(company_list)
+
+	postList.EachWithBreak(func(i int, card *goquery.Selection) bool {
+		location := card.Find("span.long").Text()
+		if location != "" {
+			location_list = append(location_list, location)
+			return true
+		}
+		return false
 	})
 }
 
@@ -87,10 +113,8 @@ func checkCode(res *http.Response) {
 	}
 }
 
-func strClnr(str string) []string { // stringCleaner
-	var slice []string
-	append(slice, str)
-	return strings.TrimSpace(str)
+func strClnr(str string) string { // stringCleaner
+	return strings.Join(strings.Fields(strings.TrimSpace(str)), " ") // strings.fields() Deleted. // strings.join() Needed.
 }
 
 // 두가지 선택지
